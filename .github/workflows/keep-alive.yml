@@ -1,0 +1,23 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Runs at 00:00 every 2 days
+    - cron: '0 0 */2 * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Keep-Alive Endpoint
+        run: |
+          if [ -z "${{ secrets.VERCEL_PROJECT_URL }}" ]; then
+            echo "Error: VERCEL_PROJECT_URL secret is missing."
+            exit 1
+          fi
+          
+          # Using curl to hit the endpoint. -f fails on HTTP errors (4xx, 5xx)
+          curl -f -s "${{ secrets.VERCEL_PROJECT_URL }}/api/keep-alive"
+          
+          echo "Ping successful to ${{ secrets.VERCEL_PROJECT_URL }}/api/keep-alive"
